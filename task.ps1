@@ -11,6 +11,7 @@ $sshKeyPublicKey = Get-Content "~/.ssh/id_rsa.pub"
 $vmName = "matebox"
 $vmImage = "Ubuntu2204"
 $vmSize = "Standard_B1s"
+$publicIpDnsLabel = "matebox-$((Get-Random).ToString().Substring(0,6))"
 
 Write-Host "Creating a resource group $resourceGroupName ..."
 New-AzResourceGroup -Name $resourceGroupName -Location $location
@@ -25,7 +26,7 @@ $subnet = New-AzVirtualNetworkSubnetConfig -Name $subnetName -AddressPrefix $sub
 $vnet = New-AzVirtualNetwork -Name $virtualNetworkName -Location $location -ResourceGroupName $resourceGroupName -AddressPrefix $vnetAddressPrefix -Subnet $subnet
 
 Write-Host "Creating public IP address $publicIpAddressName ..."
-New-AzPublicIpAddress -Name $publicIpAddressName -ResourceGroupName $resourceGroupName -AllocationMethod Static -DomainNameLabel $publicIpAddressName -Location $location
+New-AzPublicIpAddress -Name $publicIpAddressName -ResourceGroupName $resourceGroupName -AllocationMethod Static -DomainNameLabel $publicIpDnsLabel -Location $location
 
 Write-Host "Creating ssh key $sshKeyName ..."
 New-AzSshKey -Name $sshKeyName -ResourceGroupName $resourceGroupName -PublicKey $sshKeyPublicKey
