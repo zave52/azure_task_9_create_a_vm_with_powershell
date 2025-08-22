@@ -31,6 +31,16 @@ Write-Host "Creating ssh key $sshKeyName ..."
 New-AzSshKey -Name $sshKeyName -ResourceGroupName $resourceGroupName -PublicKey $sshKeyPublicKey
 
 Write-Host "Creating vm $vmName ..."
-New-AzVM -Name $vmName -ResourceGroupName $resourceGroupName -Location $location -Image $vmImage -Size $vmSize -PublicIpAddressName $publicIpAddressName -SshKeyName $sshKeyName -SubnetName $subnetName -VirtualNetworkName $virtualNetworkName
+New-AzVM `
+    -Name $vmName `
+    -ResourceGroupName $resourceGroupName `
+    -Location $location `
+    -Image $vmImage `
+    -Size $vmSize `
+    -VirtualNetworkName $virtualNetworkName `
+    -SubnetName $subnetName `
+    -SecurityGroupName $networkSecurityGroupName `
+    -PublicIpAddressName $publicIpAddressName `
+    -SshKeyName $sshKeyName `
 
 Write-Host "Host $vmName created successfully!"
