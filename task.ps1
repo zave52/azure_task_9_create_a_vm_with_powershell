@@ -20,4 +20,18 @@ $nsgRuleSSH = New-AzNetworkSecurityRuleConfig -Name SSH  -Protocol Tcp -Directio
 $nsgRuleHTTP = New-AzNetworkSecurityRuleConfig -Name HTTP  -Protocol Tcp -Direction Inbound -Priority 1002 -SourceAddressPrefix * -SourcePortRange * -DestinationAddressPrefix * -DestinationPortRange 8080 -Access Allow;
 New-AzNetworkSecurityGroup -Name $networkSecurityGroupName -ResourceGroupName $resourceGroupName -Location $location -SecurityRules $nsgRuleSSH, $nsgRuleHTTP
 
-# ↓↓↓ Write your code here ↓↓↓
+Write-Host "Creating a virtual network $virtualNetworkName with subnet $subnetName ..."
+$subnet = New-AzVirtualNetworkSubnetConfig -Name $subnetName -AddressPrefix $subnetAddressPrefix
+New-AzVirtualNetwork -Name $virtualNetworkName -Location $location -ResourceGroupName $resourceGroupName -AddressPrefix $vnetAddressPrefix -Subnet $subnet
+
+Write-Host "Creating public IP address $publicIpAddressName ..."
+New-AzPublicIpAddress -Name $publicIpAddressName -ResourceGroupName $resourceGroupName -AllocationMethod Static -DomainNameLabel $publicIpAddressName -Location $location
+
+Write-Host "Creating ssh key $sshKeyName ..."
+New-AzSshKey -Name $sshKeyName -ResourceGroupName $resourceGroupName -PublicKey $sshKeyPublicKey
+
+Write-Host "Creating vm $vmName ..."
+$credential = New-Object System.Management.Automation.PSCredential("azureuser", (New-Object System.Security.SecureString))
+New-AzVM -Name $vmName -ResourceGroupName $resourceGroupName -Location $location -Image $vmImage -Size $vmSize -PublicIpAddressName $publicIpAddressName -SshKeyName $sshKeyName -SubnetName $subnetName -VirtualNetworkName $virtualNetworkName -SecurityGroupName $networkSecurityGroupName -Credential $credential
+
+Write-Host "Host $vmName created suvvessfully!"
