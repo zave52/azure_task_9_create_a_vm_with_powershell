@@ -18,11 +18,15 @@ New-AzResourceGroup -Name $resourceGroupName -Location $location
 Write-Host "Creating a network security group $networkSecurityGroupName ..."
 $nsgRuleSSH = New-AzNetworkSecurityRuleConfig -Name SSH  -Protocol Tcp -Direction Inbound -Priority 1001 -SourceAddressPrefix * -SourcePortRange * -DestinationAddressPrefix * -DestinationPortRange 22 -Access Allow;
 $nsgRuleHTTP = New-AzNetworkSecurityRuleConfig -Name HTTP  -Protocol Tcp -Direction Inbound -Priority 1002 -SourceAddressPrefix * -SourcePortRange * -DestinationAddressPrefix * -DestinationPortRange 8080 -Access Allow;
-New-AzNetworkSecurityGroup -Name $networkSecurityGroupName -ResourceGroupName $resourceGroupName -Location $location -SecurityRules $nsgRuleSSH, $nsgRuleHTTP
+$nsg = New-AzNetworkSecurityGroup -Name $networkSecurityGroupName -ResourceGroupName $resourceGroupName -Location $location -SecurityRules $nsgRuleSSH, $nsgRuleHTTP
 
 Write-Host "Creating a virtual network $virtualNetworkName with subnet $subnetName ..."
 $subnet = New-AzVirtualNetworkSubnetConfig -Name $subnetName -AddressPrefix $subnetAddressPrefix
-New-AzVirtualNetwork -Name $virtualNetworkName -Location $location -ResourceGroupName $resourceGroupName -AddressPrefix $vnetAddressPrefix -Subnet $subnet
+$vnet = New-AzVirtualNetwork -Name $virtualNetworkName -Location $location -ResourceGroupName $resourceGroupName -AddressPrefix $vnetAddressPrefix -Subnet $subnet
+
+Write-Host "Associating NSG with subnet..."
+Set-AzVirtualNetworkSubnetConfig -VirtualNetwork $vnet -Name $subnetName -AddressPrefix $subnetAddressPrefix -NetworkSecurityGroup $nsg
+Set-AzVirtualNetwork -VirtualNetwork $vnet
 
 Write-Host "Creating public IP address $publicIpAddressName ..."
 New-AzPublicIpAddress -Name $publicIpAddressName -ResourceGroupName $resourceGroupName -AllocationMethod Static -DomainNameLabel $publicIpAddressName -Location $location
@@ -31,6 +35,6 @@ Write-Host "Creating ssh key $sshKeyName ..."
 New-AzSshKey -Name $sshKeyName -ResourceGroupName $resourceGroupName -PublicKey $sshKeyPublicKey
 
 Write-Host "Creating vm $vmName ..."
-New-AzVM -Name $vmName -ResourceGroupName $resourceGroupName -Location $location -Image $vmImage -Size $vmSize -PublicIpAddressName $publicIpAddressName -SshKeyName $sshKeyName -SubnetName $subnetName -VirtualNetworkName $virtualNetworkName -SecurityGroupName $networkSecurityGroupName
+New-AzVM -Name $vmName -ResourceGroupName $resourceGroupName -Location $location -Image $vmImage -Size $vmSize -PublicIpAddressName $publicIpAddressName -SshKeyName $sshKeyName -SubnetName $subnetName -VirtualNetworkName $virtualNetworkName
 
 Write-Host "Host $vmName created successfully!"
