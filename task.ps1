@@ -24,10 +24,6 @@ Write-Host "Creating a virtual network $virtualNetworkName with subnet $subnetNa
 $subnet = New-AzVirtualNetworkSubnetConfig -Name $subnetName -AddressPrefix $subnetAddressPrefix
 $vnet = New-AzVirtualNetwork -Name $virtualNetworkName -Location $location -ResourceGroupName $resourceGroupName -AddressPrefix $vnetAddressPrefix -Subnet $subnet
 
-Write-Host "Associating NSG with subnet..."
-Set-AzVirtualNetworkSubnetConfig -VirtualNetwork $vnet -Name $subnetName -AddressPrefix $subnetAddressPrefix -NetworkSecurityGroup $nsg
-Set-AzVirtualNetwork -VirtualNetwork $vnet
-
 Write-Host "Creating public IP address $publicIpAddressName ..."
 New-AzPublicIpAddress -Name $publicIpAddressName -ResourceGroupName $resourceGroupName -AllocationMethod Static -DomainNameLabel $publicIpAddressName -Location $location
 
