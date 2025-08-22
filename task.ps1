@@ -34,4 +34,4 @@ Write-Host "Creating vm $vmName ..."
 $credential = New-Object System.Management.Automation.PSCredential("azureuser", (New-Object System.Security.SecureString))
 New-AzVM -Name $vmName -ResourceGroupName $resourceGroupName -Location $location -Image $vmImage -Size $vmSize -PublicIpAddressName $publicIpAddressName -SshKeyName $sshKeyName -SubnetName $subnetName -VirtualNetworkName $virtualNetworkName -SecurityGroupName $networkSecurityGroupName -Credential $credential
 
-Write-Host "Host $vmName created suvvessfully!"
+Write-Host "Host $vmName created successfully!"
